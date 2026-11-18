@@ -1,0 +1,623 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CheckNgan · รวมงานจากเว็บหางานไทย</title>
+<style>
+:root{
+  --bg:#faf8f3;--surface:#fff;--text:#1d1a14;--muted:#7a7467;--line:#eee9dc;
+  --ink:#16140f;--ink2:#26221a;
+  --y:#ffc928;--y2:#ffb300;--y-soft:#fff5cc;--y-text:#7a5400;
+  --ok:#0f8a5f;--ok-soft:#e3f6ec;--err:#b42318;--err-soft:#fdecea;
+  --shadow:0 1px 2px rgba(60,45,0,.06),0 2px 8px rgba(60,45,0,.05);
+  --shadow-h:0 10px 28px rgba(255,179,0,.22);
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#12100c;--surface:#1c1913;--text:#f4efe2;--muted:#a39b87;--line:#2e2a1e;
+  --ink:#0a0907;--ink2:#1c1913;
+  --y-soft:#3a2f08;--y-text:#ffd966;
+  --ok:#4ade9d;--ok-soft:#10261c;--err:#ff8f85;--err-soft:#341512;
+  --shadow:none;--shadow-h:0 10px 28px rgba(255,201,40,.12);
+}}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Noto Sans Thai","Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.5}
+
+/* ---------- hero ---------- */
+.hero{position:relative;overflow:hidden;background:linear-gradient(135deg,var(--ink),var(--ink2));color:#fff;padding:44px 16px 82px}
+.hero::before{content:"";position:absolute;width:420px;height:420px;right:-90px;top:-170px;border-radius:50%;
+  background:radial-gradient(circle,var(--y) 0,rgba(255,201,40,.0) 68%);opacity:.55}
+.hero::after{content:"";position:absolute;width:260px;height:260px;left:-80px;bottom:-150px;border-radius:50%;
+  background:radial-gradient(circle,var(--y2) 0,rgba(255,179,0,.0) 70%);opacity:.35}
+.wrap{max-width:960px;margin:0 auto;position:relative;z-index:1}
+.brand{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.logo{width:38px;height:38px;border-radius:11px;background:var(--y);color:var(--ink);display:grid;place-items:center;font-weight:800;font-size:19px;
+  box-shadow:0 4px 14px rgba(255,201,40,.45);transform:rotate(-6deg)}
+.brand b{font-size:19px;letter-spacing:-.2px}
+.hero h1{margin:0 0 8px;font-size:34px;line-height:1.25;letter-spacing:-.5px}
+.hero h1 em{font-style:normal;color:var(--ink);background:var(--y);padding:0 10px;border-radius:10px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.hero p{margin:0;color:#d8d2c0}
+.stats{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+.stat{padding:5px 13px;border-radius:999px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.14);font-size:13px;color:#f4efe2}
+.stat b{color:var(--y)}
+
+/* ---------- search ---------- */
+.search{max-width:960px;margin:-44px auto 0;padding:0 16px;position:relative;z-index:2}
+.searchbox{background:var(--surface);border-radius:18px;box-shadow:0 14px 40px rgba(20,14,0,.22);padding:10px;display:flex;gap:8px;flex-wrap:wrap;border:1px solid var(--line)}
+.field{flex:1;min-width:170px;display:flex;align-items:center;gap:8px;padding:0 14px;border-radius:12px;background:var(--bg);border:2px solid transparent;transition:.15s}
+.field svg{flex:none;color:var(--y-text)}
+.field input,.field select{flex:1;border:0;background:transparent;color:var(--text);font:inherit;padding:13px 0;outline:none;min-width:0}
+.field select{cursor:pointer}
+.field select option{background:var(--surface);color:var(--text)}
+.field:focus-within{border-color:var(--y);background:var(--surface);box-shadow:0 0 0 4px rgba(255,201,40,.25)}
+.btn{border:0;border-radius:12px;font:inherit;font-weight:700;padding:0 24px;height:48px;cursor:pointer;background:linear-gradient(180deg,var(--y),var(--y2));color:var(--ink);
+  box-shadow:0 3px 0 #c98a00;transition:.12s}
+.btn:hover{filter:brightness(1.05);transform:translateY(-1px)}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 #c98a00}
+.btn.ghost{background:var(--y-soft);color:var(--y-text);box-shadow:none}
+.btn.ghost:hover{background:var(--y);color:var(--ink)}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+/* ---------- main ---------- */
+main{max-width:960px;margin:0 auto;padding:22px 16px 70px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.chip{border:1.5px solid var(--line);background:var(--surface);color:var(--text);padding:7px 15px;border-radius:999px;font:inherit;font-size:14px;cursor:pointer;transition:.15s}
+.chip b{color:var(--muted);font-weight:600;margin-left:6px;font-size:12px}
+.chip:hover{border-color:var(--y2);background:var(--y-soft)}
+.chip.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.chip.on b{color:var(--y)}
+@media (prefers-color-scheme:dark){.chip.on{background:var(--y);border-color:var(--y);color:var(--ink)}.chip.on b{color:var(--ink)}}
+.bar{margin-bottom:12px;color:var(--muted);font-size:14px}
+.bar b{color:var(--text)}
+
+/* ---------- job card ---------- */
+.card{position:relative;display:flex;gap:16px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px 18px 18px 20px;margin-bottom:12px;
+  text-decoration:none;color:inherit;box-shadow:var(--shadow);transition:.18s;animation:in .3s both;overflow:hidden}
+.card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:linear-gradient(var(--y),var(--y2));transform:scaleY(0);transform-origin:top;transition:.2s}
+.card:hover{transform:translateY(-2px);box-shadow:var(--shadow-h);border-color:var(--y)}
+.card:hover::before{transform:scaleY(1)}
+@keyframes in{from{opacity:0;transform:translateY(6px)}}
+.av{flex:none;width:52px;height:52px;border-radius:14px;display:grid;place-items:center;font-size:25px;border:1px solid rgba(0,0,0,.05)}
+.av.logo{background:#fff;border:1px solid var(--line);padding:5px}
+.av.logo img{max-width:100%;max-height:100%;object-fit:contain}
+.body{flex:1;min-width:0}
+.title{font-weight:700;font-size:17px;margin:0 0 2px;line-height:1.35}
+.card:hover .title{text-decoration:underline;text-decoration-color:var(--y2);text-decoration-thickness:3px;text-underline-offset:3px}
+.company{color:var(--muted);font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px;font-size:13px}
+.tag{padding:3px 10px;border-radius:8px;background:var(--bg);color:var(--muted);border:1px solid var(--line)}
+.tag.sal{background:var(--ok-soft);color:var(--ok);font-weight:700;border-color:transparent}
+.tag.cat{background:var(--y-soft);color:var(--y-text);border-color:transparent}
+.tag.src{background:var(--ink);color:var(--y);font-weight:700;border-color:transparent}
+@media (prefers-color-scheme:dark){.tag.src{background:var(--y);color:var(--ink)}}
+.side{flex:none;text-align:right;font-size:13px;color:var(--muted);display:flex;flex-direction:column;justify-content:space-between;align-items:flex-end;gap:6px}
+.go{color:var(--text);font-weight:700;border-bottom:3px solid var(--y);padding-bottom:1px}
+.skel{height:98px;border-radius:16px;margin-bottom:12px;background:linear-gradient(90deg,var(--surface) 25%,var(--y-soft) 50%,var(--surface) 75%);background-size:200% 100%;animation:sh 1.2s infinite}
+@keyframes sh{to{background-position:-200% 0}}
+.empty{text-align:center;padding:60px 0;color:var(--muted)}
+.pager{display:flex;justify-content:center;align-items:center;gap:14px;margin-top:22px;color:var(--muted)}
+
+/* ---------- AI panel ---------- */
+.ai{background:var(--surface);border:1.5px solid var(--y);border-radius:18px;margin-bottom:18px;box-shadow:var(--shadow-h);overflow:hidden}
+.ai-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 20px;cursor:pointer;background:linear-gradient(100deg,var(--y),var(--y2));color:var(--ink)}
+.ai-head .sub{color:rgba(22,20,15,.72);font-size:13px}
+.ai-head b{font-size:16px}
+#aiToggle{font-size:18px;font-weight:700}
+.ai-body{padding:8px 20px 20px}
+.drop{border:2px dashed #e0c45c;border-radius:14px;padding:28px;text-align:center;color:var(--muted);cursor:pointer;transition:.15s;margin-top:10px;background:var(--bg)}
+.drop:hover,.drop.over{border-color:var(--y2);color:var(--y-text);background:var(--y-soft)}
+.drop.has{border-style:solid;border-color:var(--ok);color:var(--ok);background:var(--ok-soft);font-weight:600}
+.ai-row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.note{font-size:12px;color:var(--muted);margin-top:9px}
+.err{margin-top:12px;padding:12px 14px;border-radius:12px;background:var(--err-soft);color:var(--err);border:1px solid rgba(180,35,24,.25)}
+.prof{margin-top:16px;padding:16px;border-radius:14px;background:var(--y-soft);border:1px solid rgba(255,179,0,.35)}
+.prof .tags{margin-top:8px}
+.salbox{margin-top:12px;padding:16px;border-radius:14px;background:var(--surface);border:2px solid var(--ok)}
+.sal-main span{display:block;font-size:13px;color:var(--muted);font-weight:600}
+.sal-main b{font-size:clamp(24px,5vw,34px);color:var(--ok);letter-spacing:-.5px;font-variant-numeric:tabular-nums}
+.sal-main em{font-style:normal;margin-left:8px;color:var(--muted);font-size:14px}
+.sal-mkt{margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--bg);font-size:13px;line-height:1.6}
+.prof .tag.cat{background:var(--surface)}
+.score{flex:none;width:58px;height:58px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:15px;
+  background:conic-gradient(var(--c) calc(var(--p)*1%),var(--line) 0);position:relative}
+.score::before{content:"";position:absolute;inset:6px;border-radius:50%;background:var(--surface)}
+.score span{position:relative}
+.reason{font-size:13px;margin-top:8px;color:var(--text)}
+.gaps{font-size:12px;color:var(--muted);margin-top:4px}
+
+.toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,90px);background:var(--ink);color:#fff;padding:12px 22px;border-radius:12px;opacity:0;transition:.3s;z-index:9;
+  border-left:5px solid var(--y);box-shadow:0 10px 30px rgba(0,0,0,.3)}
+.toast.show{transform:translate(-50%,0);opacity:1}
+@media(max-width:560px){.side{display:none}.hero h1{font-size:26px}.btn{flex:1}.hero{padding-top:30px}}
+
+/* ================= EXTRA: เว่อร์ระดับสุด ================= */
+@property --a{syntax:"<angle>";initial-value:0deg;inherits:false}
+
+/* ---- hero: mesh เคลื่อนไหว ---- */
+.hero{background:
+  radial-gradient(circle at 18% 30%,rgba(255,201,40,.28),transparent 42%),
+  radial-gradient(circle at 85% 20%,rgba(255,120,0,.30),transparent 40%),
+  radial-gradient(circle at 60% 95%,rgba(255,225,90,.22),transparent 45%),
+  linear-gradient(135deg,var(--ink),#241c06,var(--ink));
+  background-size:140% 140%,140% 140%,140% 140%,300% 300%;animation:mesh 14s ease-in-out infinite alternate;padding:54px 16px 96px}
+@keyframes mesh{0%{background-position:0 0,100% 0,50% 100%,0% 50%}100%{background-position:30% 20%,70% 30%,40% 70%,100% 50%}}
+.hero::before{width:520px;height:520px;right:-120px;top:-210px;animation:blob 9s ease-in-out infinite alternate;filter:blur(6px)}
+.hero::after{animation:blob 11s ease-in-out infinite alternate-reverse;filter:blur(4px)}
+@keyframes blob{to{transform:translate(-40px,30px) scale(1.18)}}
+.spot{position:absolute;inset:0;pointer-events:none;z-index:1;
+  background:radial-gradient(260px circle at var(--sx,50%) var(--sy,30%),rgba(255,214,70,.30),transparent 65%);transition:background .08s}
+.float{position:absolute;z-index:1;font-size:34px;opacity:.9;filter:drop-shadow(0 8px 14px rgba(0,0,0,.4));animation:bob 5s ease-in-out infinite;user-select:none}
+.float:nth-of-type(1){left:60%;top:9%;animation-delay:0s}
+.float:nth-of-type(2){left:80%;top:18%;font-size:44px;animation-delay:-1.2s}
+.float:nth-of-type(3){left:90%;top:62%;animation-delay:-2.4s}
+.float:nth-of-type(4){left:68%;top:70%;font-size:28px;animation-delay:-3.1s}
+.float:nth-of-type(5){left:42%;top:12%;font-size:26px;animation-delay:-.7s}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-6deg)}50%{transform:translateY(-20px) rotate(8deg)}}
+.logo{animation:wob 3.2s ease-in-out infinite}
+@keyframes wob{0%,100%{transform:rotate(-6deg) scale(1)}50%{transform:rotate(7deg) scale(1.12)}}
+.hero h1{font-size:clamp(34px,7vw,62px);font-weight:800;line-height:1.15;letter-spacing:-1.2px;text-shadow:0 6px 30px rgba(0,0,0,.45)}
+.hero h1 em{display:inline-block;color:var(--ink);padding:0 16px;border-radius:16px;transform:rotate(-2deg);
+  background:linear-gradient(100deg,#ffd84a,#ffb300,#ff8a00,#ffd84a);background-size:250% 100%;animation:shine 4s linear infinite;
+  box-shadow:0 8px 0 rgba(0,0,0,.35),0 14px 40px rgba(255,179,0,.55)}
+@keyframes shine{to{background-position:-250% 0}}
+.hero p{font-size:clamp(14px,2.2vw,18px);max-width:640px}
+.stat{backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);background:rgba(255,255,255,.12);border-color:rgba(255,224,110,.45);font-size:14px;
+  padding:7px 16px;transition:.2s}
+.stat:hover{transform:translateY(-3px) scale(1.05);background:rgba(255,201,40,.25)}
+.stat b{font-size:18px;font-variant-numeric:tabular-nums}
+
+/* ---- search: ขอบหมุนเรืองแสง ---- */
+.searchbox{position:relative;border:0;padding:12px;background:var(--surface);isolation:isolate}
+.searchbox::before{content:"";position:absolute;inset:-3px;border-radius:21px;z-index:-1;
+  background:conic-gradient(from var(--a),#ffc928,#ff7a00,#fff1a8,#ffb300,#ffc928);animation:spin 5s linear infinite;filter:drop-shadow(0 0 14px rgba(255,179,0,.65))}
+.searchbox::after{content:"";position:absolute;inset:0;border-radius:18px;background:var(--surface);z-index:-1}
+@keyframes spin{to{--a:360deg}}
+.field{border-radius:14px}
+.field:focus-within{transform:translateY(-2px)}
+
+/* ---- ปุ่ม: shimmer ---- */
+.btn{position:relative;overflow:hidden;font-weight:800;letter-spacing:.2px}
+.btn:not(.ghost)::after{content:"";position:absolute;top:0;left:-70%;width:45%;height:100%;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.75),transparent);transform:skewX(-20deg);animation:sweep 2.8s ease-in-out infinite}
+@keyframes sweep{0%,55%{left:-70%}100%{left:130%}}
+.btn:hover{transform:translateY(-3px) scale(1.04)}
+.btn.ghost:hover{box-shadow:0 8px 20px rgba(255,179,0,.4)}
+
+/* ---- chips ---- */
+.chip{transition:transform .25s cubic-bezier(.3,1.8,.5,1),background .15s,border-color .15s}
+.chip:hover{transform:translateY(-3px) rotate(-1.5deg) scale(1.07)}
+.chip.on{transform:scale(1.06);box-shadow:0 6px 0 rgba(0,0,0,.18),0 10px 24px rgba(255,179,0,.4)}
+
+/* ---- การ์ด: 3D tilt + glare + ขอบไล่สี ---- */
+.card{animation:pop .55s cubic-bezier(.2,.9,.3,1.35) backwards;transform-style:preserve-3d;will-change:transform;
+  transition:box-shadow .2s,border-color .2s,transform .12s ease-out}
+@keyframes pop{from{opacity:0;transform:translateY(34px) scale(.92) rotateX(12deg)}}
+.card::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .2s;
+  background:radial-gradient(380px circle at var(--mx,50%) var(--my,50%),rgba(255,214,70,.34),transparent 60%)}
+.card:hover::after{opacity:1}
+.card:hover{box-shadow:0 22px 50px rgba(255,160,0,.32),0 0 0 2px var(--y);border-color:transparent}
+.av{transition:transform .35s cubic-bezier(.3,1.8,.5,1)}
+.card:hover .av{transform:rotate(-10deg) scale(1.18)}
+.tag.sal{animation:glow 2.4s ease-in-out infinite}
+@keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(15,138,95,.0)}50%{box-shadow:0 0 0 5px rgba(15,138,95,.18)}}
+.go{transition:.2s}
+.card:hover .go{background:var(--y);padding:2px 10px;border-radius:8px;border-bottom-color:transparent;transform:translateX(-4px)}
+
+/* ---- AI panel ---- */
+.ai{position:relative;border:0;isolation:isolate}
+.ai::before{content:"";position:absolute;inset:-2px;border-radius:20px;z-index:-1;
+  background:conic-gradient(from var(--a),#ffc928,#ff7a00,#fff1a8,#ffb300,#ffc928);animation:spin 6s linear infinite}
+.ai::after{content:"";position:absolute;inset:0;border-radius:18px;background:var(--surface);z-index:-1}
+.ai-head{background:linear-gradient(100deg,#ffc928,#ff9d00,#ffc928);background-size:220% 100%;animation:shine 6s linear infinite}
+.ai-head b{font-size:18px}
+.drop.over{transform:scale(1.02);box-shadow:0 0 0 6px rgba(255,201,40,.35)}
+.score{transition:transform .3s cubic-bezier(.3,1.8,.5,1)}
+.card:hover .score{transform:scale(1.18) rotate(8deg)}
+
+/* ---- confetti ---- */
+.confetti{position:fixed;top:-20px;z-index:99;pointer-events:none;font-size:22px;animation:fall linear forwards}
+@keyframes fall{to{transform:translate(var(--dx),110vh) rotate(var(--rot));opacity:.9}}
+
+/* ---- scroll reveal ---- */
+.rv{opacity:0;transform:translateY(28px);transition:opacity .7s,transform .7s cubic-bezier(.2,.9,.3,1.2)}
+.rv.in{opacity:1;transform:none}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .rv{opacity:1;transform:none}
+}
+@media (max-width:560px){.float{display:none}.hero{padding:34px 16px 90px}}
+
+/* ================= custom dropdown (แบบเรียบ) ================= */
+.ddwrap{position:relative;padding:0;min-width:200px}
+.dd{position:relative;flex:1;min-width:0;align-self:stretch;display:flex}
+.dd-btn{flex:1;display:flex;align-items:center;gap:8px;min-width:0;border:0;background:transparent;color:var(--text);font:inherit;
+  padding:13px 14px 13px 40px;margin-left:-26px;cursor:pointer;text-align:left;border-radius:12px}
+.ddwrap > svg{margin-left:14px;position:relative;z-index:1;pointer-events:none}
+.dd-label{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dd-caret{flex:none;font-size:11px;color:var(--y-text)}
+.ddwrap:has(.dd.open){border-color:var(--y);background:var(--surface)}
+.dd-list{position:absolute;left:-42px;top:calc(100% + 12px);z-index:60;margin:0;padding:6px;list-style:none;max-height:320px;overflow:auto;
+  background:var(--surface);border:1.5px solid var(--y);border-radius:14px;box-shadow:0 12px 30px rgba(30,20,0,.18);min-width:280px}
+.dd-list[hidden]{display:none}
+.dd-list{scrollbar-color:var(--y) transparent;scrollbar-width:thin}
+.dd-list::-webkit-scrollbar{width:8px}
+.dd-list::-webkit-scrollbar-thumb{background:var(--y);border-radius:99px}
+.dd-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;cursor:pointer;font-size:14.5px;color:var(--text)}
+.dd-item .ic{display:none}
+.dd-item .tx{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dd-item .n{flex:none;font-size:12.5px;color:var(--muted)}
+.dd-item:hover,.dd-item.hl{background:var(--y-soft)}
+.dd-item.sel{background:var(--y);color:var(--ink);font-weight:700}
+.dd-item.sel .n{color:var(--ink);opacity:.7}
+@media (max-width:560px){.dd-list{left:0;right:0;min-width:0}}
+</style>
+</head>
+<body>
+<div class="hero" id="hero"><div class="spot"></div>
+  <span class="float">💼</span><span class="float">🚀</span><span class="float">✨</span><span class="float">💰</span><span class="float">📄</span>
+  <div class="wrap">
+    <div class="brand"><div class="logo">C</div><b>CheckNgan</b></div>
+    <h1>หางานทุกเว็บ <em>ที่เดียวจบ!</em></h1>
+    <p>รวมงานจาก JobThai · JobsDB · JOBTOPGUN พร้อมให้ AI ช่วยดูว่างานไหนเหมาะกับคุณที่สุด 🎯</p>
+    <div class="stats" id="stats"></div>
+  </div>
+</div>
+
+<div class="search"><div class="searchbox">
+  <label class="field"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <input id="q" placeholder="ตำแหน่งงาน หรือชื่อบริษัท" autofocus></label>
+  <label class="field"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg>
+    <input id="loc" placeholder="สถานที่ เช่น กรุงเทพ"></label>
+  <div class="field ddwrap"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    <select id="cat" hidden><option value="">ทุกหมวดงาน</option></select><div class="dd" id="ddcat"></div></div>
+  <button class="btn" id="go">ค้นหา</button>
+  <button class="btn ghost" id="scrape" title="ดึงงานใหม่จากทุกเว็บตามคำค้น">↻ ดึงงานใหม่</button>
+</div></div>
+
+<main>
+  <section class="ai" id="ai">
+    <div class="ai-head" id="aiHead">
+      <div><b>✨ ให้ AI ประเมินเรซูเม่</b><div class="sub">อัปโหลดเรซูเม่ แล้วให้ AI บอกว่าเหมาะกับงานไหนในรายการ</div></div>
+      <span id="aiToggle">▾</span>
+    </div>
+    <div class="ai-body" id="aiBody" hidden>
+      <div class="drop" id="drop">
+        <input type="file" id="resume" accept=".pdf,.docx,.txt" hidden>
+        <div id="dropText">📄 คลิกหรือลากไฟล์เรซูเม่มาวาง (.pdf / .docx / .txt)</div>
+      </div>
+      <div class="ai-row">
+        <label class="field"><input id="aiLoc" placeholder="สถานที่ที่อยากทำงาน (ไม่ใส่ก็ได้ เช่น กรุงเทพ)"></label>
+        <button class="btn" id="aiGo" disabled>วิเคราะห์เรซูเม่</button>
+      </div>
+      <div class="note">🔒 ไฟล์ไม่ถูกบันทึกในเครื่อง ส่งไปประมวลผลที่ Groq API เท่านั้น · ใช้เวลาประมาณ 20-60 วินาที</div>
+      <div id="aiResult"></div>
+    </div>
+  </section>
+  <div class="chips" id="chips"></div>
+  <div class="bar" id="info"></div>
+  <div id="list"></div>
+  <div class="pager" id="pager"></div>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+const LIMIT = 20;
+let offset = 0, source = "", total = 0;
+const $ = id => document.getElementById(id);
+const ESC = {"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"};
+const esc = s => (s ?? "").toString().replace(/[&<>"]/g, c => ESC[c]);
+const NAMES = {jobthai: "JobThai", jobsdb: "JobsDB", jobtopgun: "JOBTOPGUN", jobbkk: "JobBKK", workventure: "WorkVenture", blognone: "Blognone"};
+const nm = s => NAMES[s] || s;
+const ICONS = {
+  "ไอที / โปรแกรมเมอร์": "💻", "การแพทย์ / สาธารณสุข": "🩺", "บัญชี / การเงิน / ธนาคาร": "💰",
+  "กฎหมาย": "⚖️", "การศึกษา / ฝึกอบรม": "🎓", "ทรัพยากรบุคคล": "🤝",
+  "การตลาด / โฆษณา / ครีเอทีฟ": "📣", "ขาย": "🛒", "บริการลูกค้า / Call Center": "🎧",
+  "วิศวกรรม": "⚙️", "ก่อสร้าง / สถาปัตย์ / อสังหา": "🏗️", "ขนส่ง / โลจิสติกส์ / คลังสินค้า": "🚚",
+  "ผลิต / โรงงาน / ควบคุมคุณภาพ": "🏭", "อาหาร / โรงแรม / ท่องเที่ยว / บริการ": "🍽️",
+  "วิทยาศาสตร์ / เกษตร": "🔬", "ธุรการ / จัดซื้อ / ประสานงาน": "🗂️", "อื่นๆ": "💼"
+};
+const grad = h => `linear-gradient(135deg,hsl(${h} 90% 93%),hsl(${(h + 30) % 360} 85% 86%))`;
+const hue = s => { let h = 0; for (const c of s) h = (h * 31 + c.charCodeAt(0)) % 360; return h; };
+
+function ago(iso) {
+  if (!iso) return "";
+  const d = new Date(iso.includes("T") ? iso : iso.replace(" ", "T") + "Z");
+  const m = (Date.now() - d) / 6e4;
+  if (m < 60) return Math.max(1, Math.round(m)) + " นาทีที่แล้ว";
+  if (m < 1440) return Math.round(m / 60) + " ชม.ที่แล้ว";
+  if (m < 43200) return Math.round(m / 1440) + " วันที่แล้ว";
+  return d.toLocaleDateString("th-TH");
+}
+function toast(t) {
+  const e = $("toast");
+  e.textContent = t; e.classList.add("show");
+  clearTimeout(toast.t);
+  toast.t = setTimeout(() => e.classList.remove("show"), 3500);
+}
+async function getSources() { return (await fetch("/api/sources")).json(); }
+const sum = s => s.reduce((a, x) => a + x.count, 0);
+
+async function loadChips() {
+  const s = await getSources();
+  $("stats").innerHTML =
+    `<span class="stat">งานทั้งหมด <b data-n="${sum(s)}">0</b></span>` +
+    `<span class="stat">จาก <b data-n="${s.length}">0</b> เว็บ</span>` +
+    `<span class="stat">อัปเดตล่าสุดตอนกด “ดึงงานใหม่”</span>`;
+  document.querySelectorAll("#stats b").forEach(countUp);
+  const items = [{source: "", count: sum(s)}].concat(s);
+  $("chips").innerHTML = items.map(x =>
+    `<button class="chip ${x.source === source ? "on" : ""}" data-s="${esc(x.source)}">${x.source ? esc(nm(x.source)) : "ทั้งหมด"}<b>${x.count}</b></button>`).join("");
+  document.querySelectorAll(".chip").forEach(b => b.onclick = () => { source = b.dataset.s; loadCats(); load(0); loadChips(); });
+}
+
+async function loadCats() {
+  const cur = $("cat").value;
+  const cats = await (await fetch("/api/categories?source=" + encodeURIComponent(source))).json();
+  $("cat").innerHTML = '<option value="">ทุกหมวดงาน</option>' +
+    cats.map(c => `<option value="${esc(c.category)}">${esc(c.category)} (${c.count})</option>`).join("");
+  $("cat").value = cats.some(c => c.category === cur) ? cur : "";
+}
+
+async function load(dir = 0) {
+  offset = dir === 0 ? 0 : Math.max(0, offset + dir * LIMIT);
+  $("list").innerHTML = '<div class="skel"></div>'.repeat(5);
+  const p = new URLSearchParams({q: $("q").value.trim(), location: $("loc").value.trim(), source, category: $("cat").value, limit: LIMIT, offset});
+  const d = await (await fetch("/api/jobs?" + p)).json();
+  total = d.total;
+  $("info").innerHTML = `พบ <b>${total.toLocaleString()}</b> งาน`;
+  $("list").innerHTML = d.jobs.length ? d.jobs.map((j, i) => {
+    const h = hue(j.category || j.title);
+    const icon = ICONS[j.category] || "💼";
+    const av = j.logo
+      ? `<div class="av logo"><img src="${esc(j.logo)}" alt="" loading="lazy" referrerpolicy="no-referrer"
+           onerror="this.parentNode.className='av';this.parentNode.style.background='${grad(h)}';this.parentNode.textContent='${icon}'"></div>`
+      : `<div class="av" style="background:${grad(h)}">${icon}</div>`;
+    return `<a class="card" style="animation-delay:${i * 25}ms" href="${esc(j.url)}" target="_blank" rel="noopener">
+      ${av}
+      <div class="body">
+        <h3 class="title">${esc(j.title)}</h3>
+        <div class="company">${esc(j.company) || "-"}</div>
+        <div class="tags">
+          ${j.salary ? `<span class="tag sal">${esc(j.salary)}</span>` : ""}
+          ${j.location ? `<span class="tag">📍 ${esc(j.location)}</span>` : ""}
+          ${j.category ? `<span class="tag cat">${esc(j.category)}</span>` : ""}
+          ${j.job_type && j.job_type !== j.category ? `<span class="tag">${esc(j.job_type)}</span>` : ""}
+        </div>
+      </div>
+      <div class="side">
+        <span class="tag src">${esc(nm(j.source))}</span>
+        <span>${esc(ago(j.posted_at || j.scraped_at))}</span>
+        <span class="go">ดูรายละเอียด →</span>
+      </div>
+    </a>`;
+  }).join("") : '<div class="empty">ไม่พบงานที่ตรงกับการค้นหา<br>ลองกด “ดึงงานใหม่” เพื่อดึงงานตามคำค้นนี้</div>';
+  const pages = Math.max(1, Math.ceil(total / LIMIT)), cur = Math.floor(offset / LIMIT) + 1;
+  $("pager").innerHTML = total > LIMIT
+    ? `<button class="btn ghost" ${cur <= 1 ? "disabled" : ""} onclick="load(-1)">← ก่อนหน้า</button>
+       <span>หน้า ${cur} / ${pages}</span>
+       <button class="btn ghost" ${cur >= pages ? "disabled" : ""} onclick="load(1)">ถัดไป →</button>` : "";
+  if (dir !== 0) window.scrollTo({top: 0, behavior: "smooth"});
+}
+
+$("scrape").onclick = async () => {
+  const b = $("scrape");
+  b.disabled = true; b.textContent = "กำลังดึงงาน…";
+  const before = sum(await getSources());
+  await fetch("/api/scrape?keyword=" + encodeURIComponent($("q").value.trim()), {method: "POST"});
+  toast("เริ่มดึงงานจากทุกเว็บแล้ว อาจใช้เวลาประมาณครึ่งนาที");
+  let added = 0;
+  for (let i = 0; i < 20; i++) {
+    await new Promise(r => setTimeout(r, 3000));
+    added = sum(await getSources()) - before;
+    if (added > 0 && i >= 3) break;
+  }
+  toast(added > 0 ? `ดึงงานใหม่เพิ่ม ${added} รายการ` : "ไม่พบงานใหม่เพิ่ม");
+  if (added > 0) confetti();
+  b.disabled = false; b.textContent = "↻ ดึงงานใหม่";
+  loadChips(); loadCats(); load(0);
+};
+// ---------- AI ประเมินเรซูเม่ ----------
+let resumeFile = null;
+$("aiHead").onclick = () => { const b = $("aiBody"); b.hidden = !b.hidden; $("aiToggle").textContent = b.hidden ? "▾" : "▴"; };
+function setFile(f) {
+  resumeFile = f;
+  $("drop").classList.toggle("has", !!f);
+  $("dropText").textContent = f ? "✅ " + f.name : "📄 คลิกหรือลากไฟล์เรซูเม่มาวาง (.pdf / .docx / .txt)";
+  $("aiGo").disabled = !f;
+}
+$("drop").onclick = () => $("resume").click();
+$("resume").onchange = e => setFile(e.target.files[0] || null);
+["dragover", "dragenter"].forEach(ev => $("drop").addEventListener(ev, e => { e.preventDefault(); $("drop").classList.add("over"); }));
+["dragleave", "drop"].forEach(ev => $("drop").addEventListener(ev, e => { e.preventDefault(); $("drop").classList.remove("over"); }));
+$("drop").addEventListener("drop", e => setFile(e.dataTransfer.files[0] || null));
+
+const baht = n => Number(n).toLocaleString("th-TH");
+function salaryBox(p, m) {
+  if (!p.expected_salary_max && !m) return "";
+  const est = p.expected_salary_max
+    ? `<div class="sal-main"><span>💰 เงินเดือนที่เหมาะกับคุณ (AI ประเมิน)</span>
+         <b>${baht(p.expected_salary_min)} – ${baht(p.expected_salary_max)}</b><em>บาท/เดือน</em></div>
+       <div class="reason">${esc(p.salary_reasoning)}</div>`
+    : "";
+  const mk = m
+    ? `<div class="sal-mkt">📊 ตลาดตอนนี้ — ${esc(m.basis)} (${m.n} งาน):
+         ส่วนใหญ่ <b>${baht(m.p25)} – ${baht(m.p75)}</b> · กลาง <b>${baht(m.median)}</b> · ต่ำสุด–สูงสุด ${baht(m.min)} – ${baht(m.max)} บาท</div>`
+    : `<div class="sal-mkt">📊 ยังไม่มีงานที่ระบุเงินเดือนมากพอให้เทียบกับตลาด</div>`;
+  return `<div class="salbox">${est}${mk}
+    <div class="note">⚠️ เป็นเพียงค่าประมาณ ไม่ใช่ข้อเสนอจริง เงินเดือนขึ้นกับบริษัท การต่อรอง และรายละเอียดงาน</div></div>`;
+}
+const scoreColor =s => s >= 75 ? "#16a34a" : s >= 50 ? "#ffb300" : "#b8b2a2";
+$("aiGo").onclick = async () => {
+  const btn = $("aiGo"), out = $("aiResult");
+  btn.disabled = true; btn.textContent = "AI กำลังอ่านเรซูเม่…";
+  out.innerHTML = '<div class="skel" style="margin-top:14px"></div><div class="skel"></div>';
+  const fd = new FormData();
+  fd.append("file", resumeFile); fd.append("location", $("aiLoc").value);
+  try {
+    const r = await fetch("/api/match", {method: "POST", body: fd});
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.detail || "เกิดข้อผิดพลาด");
+    const p = d.profile;
+    out.innerHTML = `<div class="prof"><b>${esc(p.current_or_recent_title)}</b> · ${esc(p.level)} · ประสบการณ์ ~${esc(p.years_experience)} ปี
+      <div class="reason">${esc(p.summary)}</div>
+      <div class="tags">${p.skills.slice(0, 14).map(s => `<span class="tag cat">${esc(s)}</span>`).join("")}</div>
+      <div class="note">หมวดที่เหมาะ: ${p.suitable_categories.map(esc).join(", ")} · ประเมินจาก ${d.candidates} งานที่ใกล้เคียง (แสดง ${d.matches.length} อันดับแรก)</div></div>
+      ${salaryBox(p, d.market)}
+      <div style="margin-top:12px">${d.matches.map((j, i) => `
+      <a class="card" style="animation-delay:${i * 25}ms" href="${esc(j.url)}" target="_blank" rel="noopener">
+        <div class="score" style="--p:${j.score};--c:${scoreColor(j.score)}"><span>${j.score}%</span></div>
+        <div class="body"><h3 class="title">${esc(j.title)}</h3>
+          <div class="company">${esc(j.company) || "-"} · ${esc(j.location) || "-"}</div>
+          <div class="reason">${esc(j.reason)}</div>
+          ${j.gaps.length ? `<div class="gaps">ควรเสริม: ${j.gaps.map(esc).join(" · ")}</div>` : ""}
+          <div class="tags">${j.salary ? `<span class="tag sal">${esc(j.salary)}</span>` : ""}<span class="tag src">${esc(nm(j.source))}</span></div>
+        </div></a>`).join("")}</div>`;
+    confetti(50);
+  } catch (e) {
+    out.innerHTML = `<div class="err">${esc(e.message)}</div>`;
+  }
+  btn.disabled = !resumeFile; btn.textContent = "วิเคราะห์เรซูเม่";
+};
+
+$("go").onclick = () => load(0);
+["q", "loc"].forEach(i => $(i).addEventListener("keydown", e => e.key === "Enter" && load(0)));
+$("cat").onchange = () => load(0);
+
+// ================= EXTRA: เอฟเฟกต์เว่อร์ =================
+const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+// แสงสปอตไลต์ตามเมาส์ในส่วนหัว
+const heroEl = $("hero");
+if (heroEl && !REDUCED) {
+  heroEl.addEventListener("mousemove", e => {
+    const r = heroEl.getBoundingClientRect();
+    heroEl.style.setProperty("--sx", (e.clientX - r.left) + "px");
+    heroEl.style.setProperty("--sy", (e.clientY - r.top) + "px");
+  });
+}
+
+// การ์ดเอียง 3D ตามเมาส์ + แสงสะท้อน (ใช้ event delegation เพราะการ์ดถูกสร้างใหม่ตลอด)
+function tilt(e) {
+  const c = e.target.closest(".card");
+  if (!c || REDUCED) return;
+  const r = c.getBoundingClientRect();
+  const x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+  c.style.setProperty("--mx", x * 100 + "%");
+  c.style.setProperty("--my", y * 100 + "%");
+  c.style.transform = `perspective(900px) rotateX(${(0.5 - y) * 7}deg) rotateY(${(x - 0.5) * 9}deg) translateY(-4px) scale(1.012)`;
+}
+function untilt(e) {
+  const c = e.target.closest && e.target.closest(".card");
+  if (c) c.style.transform = "";
+}
+["list", "aiResult"].forEach(id => {
+  $(id).addEventListener("mousemove", tilt);
+  $(id).addEventListener("mouseout", untilt);
+});
+
+// ตัวเลขนับขึ้น
+function countUp(el) {
+  const to = +el.dataset.n || 0;
+  if (REDUCED) { el.textContent = to.toLocaleString(); return; }
+  const t0 = performance.now(), dur = 1100;
+  setTimeout(() => { el.textContent = to.toLocaleString(); }, dur + 150);  // กันพลาด: ให้ค่าสุดท้ายถูกต้องเสมอ
+  const step = t => {
+    const p = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - p, 3);
+    el.textContent = Math.round(to * e).toLocaleString();
+    if (p < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
+// พลุกระดาษ
+function confetti(n = 70) {
+  if (REDUCED) return;
+  const bits = ["🎉", "✨", "⭐", "💛", "🟡", "🎊", "💼"];
+  for (let i = 0; i < n; i++) {
+    const s = document.createElement("span");
+    s.className = "confetti";
+    s.textContent = bits[Math.floor(Math.random() * bits.length)];
+    s.style.left = Math.random() * 100 + "vw";
+    s.style.fontSize = 14 + Math.random() * 22 + "px";
+    s.style.setProperty("--dx", (Math.random() * 240 - 120) + "px");
+    s.style.setProperty("--rot", (Math.random() * 900 - 450) + "deg");
+    s.style.animationDuration = 1.6 + Math.random() * 1.8 + "s";
+    s.style.animationDelay = Math.random() * 0.4 + "s";
+    document.body.appendChild(s);
+    setTimeout(() => s.remove(), 4200);
+  }
+}
+
+// ค่อยๆ โผล่ตามการเลื่อนหน้า
+const io = "IntersectionObserver" in window
+  ? new IntersectionObserver(es => es.forEach(x => { if (x.isIntersecting) { x.target.classList.add("in"); io.unobserve(x.target); } }), {threshold: .08})
+  : null;
+document.querySelectorAll(".ai,.chips,.bar").forEach(el => { el.classList.add("rv"); io ? io.observe(el) : el.classList.add("in"); });
+
+
+// ================= custom dropdown: ครอบ <select id="cat"> เดิม (ยังอ่าน/เขียน $("cat").value ได้เหมือนเดิม) =================
+(function () {
+  const sel = $("cat"), box = $("ddcat");
+  const btn = document.createElement("button");
+  btn.type = "button"; btn.className = "dd-btn";
+  btn.setAttribute("aria-haspopup", "listbox");
+  btn.innerHTML = '<span class="dd-label"></span><span class="dd-caret">▾</span>';
+  const list = document.createElement("ul");
+  list.className = "dd-list"; list.setAttribute("role", "listbox"); list.hidden = true;
+  box.append(btn, list);
+  let hl = -1;
+
+  const parse = o => {                      // "ไอที / โปรแกรมเมอร์ (176)" -> {text, n}
+    const m = o.textContent.match(/^(.*?)\s*\((\d+)\)$/);
+    return m ? {text: m[1], n: m[2]} : {text: o.textContent, n: ""};
+  };
+  const icon = v => (v ? (ICONS[parse({textContent: v}).text] || "💼") : "🗂️");
+
+  function render() {
+    const opts = [...sel.options];
+    list.innerHTML = opts.map((o, i) => {
+      const p = parse(o);
+      return `<li class="dd-item ${o.value === sel.value ? "sel" : ""}" role="option" data-i="${i}">
+        <span class="ic">${icon(o.value)}</span><span class="tx">${esc(p.text)}</span>${p.n ? `<span class="n">${p.n}</span>` : ""}</li>`;
+    }).join("");
+    const cur = opts.find(o => o.value === sel.value) || opts[0];
+    btn.querySelector(".dd-label").textContent = cur ? parse(cur).text : "ทุกหมวดงาน";
+  }
+  function open(v) {
+    list.hidden = !v; box.classList.toggle("open", v);
+    btn.setAttribute("aria-expanded", v);
+    if (v) { hl = [...sel.options].findIndex(o => o.value === sel.value); const s = list.querySelector(".sel"); s && s.scrollIntoView({block: "nearest"}); }
+  }
+  function pick(i) {
+    sel.selectedIndex = i; render(); open(false);
+    sel.dispatchEvent(new Event("change"));
+  }
+  function mark(i) {
+    const items = list.querySelectorAll(".dd-item");
+    items.forEach(x => x.classList.remove("hl"));
+    if (items[i]) { items[i].classList.add("hl"); items[i].scrollIntoView({block: "nearest"}); hl = i; }
+  }
+
+  btn.onclick = e => { e.stopPropagation(); open(list.hidden); };
+  list.onclick = e => { const li = e.target.closest(".dd-item"); if (li) pick(+li.dataset.i); };
+  document.addEventListener("click", e => { if (!box.contains(e.target)) open(false); });
+  btn.addEventListener("keydown", e => {
+    const n = sel.options.length;
+    if (e.key === "Escape") open(false);
+    else if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault();
+      if (list.hidden) open(true);
+      mark(Math.max(0, Math.min(n - 1, (hl < 0 ? sel.selectedIndex : hl) + (e.key === "ArrowDown" ? 1 : -1))));
+    } else if (e.key === "Enter" && !list.hidden && hl >= 0) { e.preventDefault(); pick(hl); }
+  });
+
+  // loadCats() เปลี่ยน options/ค่าของ select เดิม -> วาดเมนูใหม่ตาม (observer ทำงานหลัง loadCats ตั้งค่าเสร็จ)
+  new MutationObserver(render).observe(sel, {childList: true});
+  render();
+})();
+
+loadChips(); loadCats(); load(0);
+</script>
+</body>
+</html>

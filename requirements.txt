@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+httpx
+beautifulsoup4
+pypdf
+python-docx
+python-multipart
